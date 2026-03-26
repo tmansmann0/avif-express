@@ -81,6 +81,10 @@ class Cron
 
         if (empty($filesToConvert)) return false;
 
+        if (Options::getBgNoProcessingWindowEnabled() && self::isInNoProcessingWindow()) {
+            return false;
+        }
+
         if (Options::getBgQuietWindowEnabled() && !self::isInQuietWindow()) {
             return false;
         }
@@ -149,10 +153,73 @@ class Cron
 
     private static function isInQuietWindow()
     {
-        $currentSeconds = (int)current_time('timestamp');
-        $now = (int)strftime('%H', $currentSeconds) * 3600 + (int)strftime('%M', $currentSeconds) * 60;
-        $start = self::getWindowSeconds(Options::getBgQuietWindowStart());
-        $end = self::getWindowSeconds(Options::getBgQuietWindowEnd());
+        return self::isWithinWindow(
+            Options::getBgQuietWindowStart(),
+            Options::getBgQuietWindowEnd()
+        );
+    }
+
+    private static function isInNoProcessingWindow()
+    {
+        return self::isWithinWindow(
+            Options::getBgNoProcessingWindowStart(),
+            Options::getBgNoProcessingWindowEnd()
+        );
+    }
+
+    public static function getProcessingStatus()
+    {
+        $activeUsers = count(self::getRecentActivity());
+        $isBusy = self::isBusyWindow();
+        $isNoProcessingWindow = Options::getBgNoProcessingWindowEnabled() && self::isInNoProcessingWindow();
+        $isOffPeakWindowEnabled = Options::getBgQuietWindowEnabled();
+        $isOffPeakWindow = $isOffPeakWindowEnabled ? self::isInQuietWindow() : true;
+        $isBackgroundConversionEnabled = Options::getBackgroundConv() !== 'off';
+        $isCronScheduled = (bool) wp_next_scheduled('avife_auto_convert');
+        $nextRunTimestamp = wp_next_scheduled('avife_auto_convert');
+
+        $reason = 'ready';
+        $isAllowed = true;
+
+        if (!$isBackgroundConversionEnabled) {
+            $isAllowed = false;
+            $reason = 'background_disabled';
+        } elseif ($isNoProcessingWindow) {
+            $isAllowed = false;
+            $reason = 'no_processing_hours';
+        } elseif ($isOffPeakWindowEnabled && !$isOffPeakWindow) {
+            $isAllowed = false;
+            $reason = 'outside_off_peak_hours';
+        } elseif (Options::getBgIdleAware() && $isBusy) {
+            $isAllowed = false;
+            $reason = 'site_busy';
+        }
+
+        return [
+            'isAllowed' => $isAllowed,
+            'reason' => $reason,
+            'statusLabel' => $isAllowed ? 'ready' : 'paused',
+            'activeUsers' => $activeUsers,
+            'activeUsersThreshold' => (int) Options::getBgActiveUsers(),
+            'offPeakEnabled' => $isOffPeakWindowEnabled,
+            'isInOffPeakWindow' => $isOffPeakWindow,
+            'noProcessingEnabled' => Options::getBgNoProcessingWindowEnabled(),
+            'isInNoProcessingWindow' => $isNoProcessingWindow,
+            'idleAwareEnabled' => Options::getBgIdleAware(),
+            'isBusyWindow' => $isBusy,
+            'cronScheduled' => $isCronScheduled,
+            'nextRunTimestamp' => $nextRunTimestamp ?: 0,
+            'nextRunLocal' => $nextRunTimestamp ? wp_date('Y-m-d H:i:s', $nextRunTimestamp) : '',
+            'currentTimeLocal' => wp_date('Y-m-d H:i:s', current_time('timestamp')),
+        ];
+    }
+
+    private static function isWithinWindow($startValue, $endValue)
+    {
+        $currentSeconds = (int) current_time('timestamp');
+        $now = ((int) wp_date('H', $currentSeconds)) * 3600 + ((int) wp_date('i', $currentSeconds)) * 60;
+        $start = self::getWindowSeconds($startValue);
+        $end = self::getWindowSeconds($endValue);
 
         if ($start === false || $end === false) {
             return false;

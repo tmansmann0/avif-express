@@ -513,7 +513,7 @@ class Options
 
     public static function setBgIdleAware($value = false)
     {
-        return update_option('avifbgidleaware', (string)$value === '1' || (string)$value === 'true');
+        return update_option('avifbgidleaware', self::normalizeBoolValue($value));
     }
 
     public static function ajaxGetBgActiveUsers()
@@ -585,7 +585,7 @@ class Options
 
     public static function setBgQuietWindowEnabled($value = false)
     {
-        return update_option('avifbgquietwindowenabled', (string)$value === '1' || (string)$value === 'true');
+        return update_option('avifbgquietwindowenabled', self::normalizeBoolValue($value));
     }
 
     public static function ajaxGetBgQuietWindowStart()
@@ -609,11 +609,8 @@ class Options
 
     public static function setBgQuietWindowStart($value = '01:00')
     {
-        $value = sanitize_text_field($value);
-        if (!preg_match('/^(?:2[0-3]|[01]?\d):[0-5]\d$/', $value)) {
-            return false;
-        }
-
+        $value = self::sanitizeTimeValue($value);
+        if ($value === false) return false;
         return update_option('avifbgquietwindowstart', $value);
     }
 
@@ -638,11 +635,107 @@ class Options
 
     public static function setBgQuietWindowEnd($value = '06:00')
     {
+        $value = self::sanitizeTimeValue($value);
+        if ($value === false) return false;
+        return update_option('avifbgquietwindowend', $value);
+    }
+
+    public static function ajaxGetBgNoProcessingWindowEnabled()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::getBgNoProcessingWindowEnabled());
+        wp_die();
+    }
+
+    public static function getBgNoProcessingWindowEnabled()
+    {
+        return (bool)get_option('avifbgnoprocessingenabled', false);
+    }
+
+    public static function ajaxSetBgNoProcessingWindowEnabled()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::setBgNoProcessingWindowEnabled($_POST['avifbgnoprocessingenabled']));
+        wp_die();
+    }
+
+    public static function setBgNoProcessingWindowEnabled($value = false)
+    {
+        return update_option('avifbgnoprocessingenabled', self::normalizeBoolValue($value));
+    }
+
+    public static function ajaxGetBgNoProcessingWindowStart()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::getBgNoProcessingWindowStart());
+        wp_die();
+    }
+
+    public static function getBgNoProcessingWindowStart()
+    {
+        return sanitize_text_field(get_option('avifbgnoprocessingstart', '22:00'));
+    }
+
+    public static function ajaxSetBgNoProcessingWindowStart()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::setBgNoProcessingWindowStart(sanitize_text_field($_POST['avifbgnoprocessingstart'])));
+        wp_die();
+    }
+
+    public static function setBgNoProcessingWindowStart($value = '22:00')
+    {
+        $value = self::sanitizeTimeValue($value);
+        if ($value === false) return false;
+        return update_option('avifbgnoprocessingstart', $value);
+    }
+
+    public static function ajaxGetBgNoProcessingWindowEnd()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::getBgNoProcessingWindowEnd());
+        wp_die();
+    }
+
+    public static function getBgNoProcessingWindowEnd()
+    {
+        return sanitize_text_field(get_option('avifbgnoprocessingend', '08:00'));
+    }
+
+    public static function ajaxSetBgNoProcessingWindowEnd()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::setBgNoProcessingWindowEnd(sanitize_text_field($_POST['avifbgnoprocessingend'])));
+        wp_die();
+    }
+
+    public static function setBgNoProcessingWindowEnd($value = '08:00')
+    {
+        $value = self::sanitizeTimeValue($value);
+        if ($value === false) return false;
+        return update_option('avifbgnoprocessingend', $value);
+    }
+
+    public static function ajaxGetBgProcessingStatus()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo wp_json_encode(Cron::getProcessingStatus());
+        wp_die();
+    }
+
+    private static function normalizeBoolValue($value)
+    {
+        return (string)$value === '1' || (string)$value === 'true';
+    }
+
+    private static function sanitizeTimeValue($value)
+    {
         $value = sanitize_text_field($value);
+
         if (!preg_match('/^(?:2[0-3]|[01]?\d):[0-5]\d$/', $value)) {
             return false;
         }
 
-        return update_option('avifbgquietwindowend', $value);
+        return $value;
     }
 }
