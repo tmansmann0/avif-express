@@ -167,14 +167,14 @@ class Cron
             $backgroundImageConverterObj = BackgroundImageConverter::get_instance($worker);
 
             if (self::shouldPauseBackgroundProcessing()) {
-                if ($backgroundImageConverterObj->is_processing() || $backgroundImageConverterObj->is_queued()) {
-                    $backgroundImageConverterObj->pause();
+                if ($backgroundImageConverterObj->isProcessingSafe() || $backgroundImageConverterObj->hasQueuedItems()) {
+                    $backgroundImageConverterObj->pauseWorker();
                 }
                 continue;
             }
 
-            if ($backgroundImageConverterObj->is_paused() && $backgroundImageConverterObj->is_queued()) {
-                $backgroundImageConverterObj->resume();
+            if ($backgroundImageConverterObj->isPausedSafe() && $backgroundImageConverterObj->hasQueuedItems()) {
+                $backgroundImageConverterObj->resumeWorker();
             }
         }
     }
@@ -187,10 +187,10 @@ class Cron
             $backgroundImageConverterObj = BackgroundImageConverter::get_instance($worker);
 
             if (
-                $backgroundImageConverterObj->is_processing() ||
-                $backgroundImageConverterObj->is_queued() ||
-                $backgroundImageConverterObj->is_paused() ||
-                $backgroundImageConverterObj->is_cancelled()
+                $backgroundImageConverterObj->isProcessingSafe() ||
+                $backgroundImageConverterObj->hasQueuedItems() ||
+                $backgroundImageConverterObj->isPausedSafe() ||
+                $backgroundImageConverterObj->isCancelledSafe()
             ) {
                 $workersKilled++;
             }

@@ -63,4 +63,5 @@ $cron->initiateCron();
  * initializing Background image converter for WP_Background_Process 
  * to make ajax path already present during Async conversion
  */
-$bg_converter = new BackgroundImageConverter();
+BackgroundImageConverter::get_instance(0);
+BackgroundImageConverter::get_instance(1);
