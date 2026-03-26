@@ -46,6 +46,24 @@ class Routes
 
         add_action('wp_ajax_ajaxGetBackgroundConvEvent', array('Avife\common\Options', 'ajaxGetBackgroundConvEvent'));
         add_action('wp_ajax_ajaxSetBackgroundConvEvent', array('Avife\common\Options', 'ajaxSetBackgroundConvEvent'));
+        add_action('wp_ajax_ajaxGetBgWorkerCount', array('Avife\common\Options', 'ajaxGetBgWorkerCount'));
+        add_action('wp_ajax_ajaxSetBgWorkerCount', array('Avife\common\Options', 'ajaxSetBgWorkerCount'));
+        add_action('wp_ajax_ajaxGetBgRunBatchSize', array('Avife\common\Options', 'ajaxGetBgRunBatchSize'));
+        add_action('wp_ajax_ajaxSetBgRunBatchSize', array('Avife\common\Options', 'ajaxSetBgRunBatchSize'));
+        add_action('wp_ajax_ajaxGetBgSleepSeconds', array('Avife\common\Options', 'ajaxGetBgSleepSeconds'));
+        add_action('wp_ajax_ajaxSetBgSleepSeconds', array('Avife\common\Options', 'ajaxSetBgSleepSeconds'));
+        add_action('wp_ajax_ajaxGetBgIdleAware', array('Avife\common\Options', 'ajaxGetBgIdleAware'));
+        add_action('wp_ajax_ajaxSetBgIdleAware', array('Avife\common\Options', 'ajaxSetBgIdleAware'));
+        add_action('wp_ajax_ajaxGetBgActiveUsers', array('Avife\common\Options', 'ajaxGetBgActiveUsers'));
+        add_action('wp_ajax_ajaxSetBgActiveUsers', array('Avife\common\Options', 'ajaxSetBgActiveUsers'));
+        add_action('wp_ajax_ajaxGetBgActivityWindowSeconds', array('Avife\common\Options', 'ajaxGetBgActivityWindowSeconds'));
+        add_action('wp_ajax_ajaxSetBgActivityWindowSeconds', array('Avife\common\Options', 'ajaxSetBgActivityWindowSeconds'));
+        add_action('wp_ajax_ajaxGetBgQuietWindowEnabled', array('Avife\common\Options', 'ajaxGetBgQuietWindowEnabled'));
+        add_action('wp_ajax_ajaxSetBgQuietWindowEnabled', array('Avife\common\Options', 'ajaxSetBgQuietWindowEnabled'));
+        add_action('wp_ajax_ajaxGetBgQuietWindowStart', array('Avife\common\Options', 'ajaxGetBgQuietWindowStart'));
+        add_action('wp_ajax_ajaxSetBgQuietWindowStart', array('Avife\common\Options', 'ajaxSetBgQuietWindowStart'));
+        add_action('wp_ajax_ajaxGetBgQuietWindowEnd', array('Avife\common\Options', 'ajaxGetBgQuietWindowEnd'));
+        add_action('wp_ajax_ajaxSetBgQuietWindowEnd', array('Avife\common\Options', 'ajaxSetBgQuietWindowEnd'));
 
         add_action('wp_ajax_ajaxCountMedia', array('Avife\common\Media', 'ajaxCountMedia'));
         add_action('wp_ajax_ajaxConvertRemaining', array('Avife\common\Media', 'ajaxConvertRemaining'));

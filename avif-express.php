@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
  * Author: Pijush Gupta
  * Author uri: https://www.linkedin.com/in/pijush-gupta-php/
  * Description: Convert Images to AVIF and serve them
- * Version: 2025.08.29
+ * Version: 2026.03.25.1
  * Tags: avif, images, performance, avif
  * text-domain: avif-express
  */
@@ -21,6 +21,11 @@ function initiate_plugin()
      * So it little to no use. Keeping it for future.
      */
     if (!defined('AVIFE_TEXT_DOMAIN')) define('AVIFE_TEXT_DOMAIN', 'avif-express');
+
+    /**
+     * plugin version for cache busting and update visibility
+     */
+    if (!defined('AVIFE_VERSION')) define('AVIFE_VERSION', '2026.03.25.1');
 
     /**
      * plugin's admin page html title

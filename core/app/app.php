@@ -50,6 +50,8 @@ if (!is_admin()) {
     Html::init();
 }
 
+add_action('init', [Cron::class, 'trackWebsiteActivity']);
+
 /**
  * initializing cron based on preset events 
  * if event is same as before will not do anything 

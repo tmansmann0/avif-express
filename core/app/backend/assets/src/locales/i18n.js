@@ -49,7 +49,17 @@ const i18n = createI18n({
 			fallbackText:"Fallback Image type",
 			original:"Original",
 			webp:"WebP",
-			fallbackDescription:"For browsers that do not support avif images"
+			fallbackDescription:"For browsers that do not support avif images",
+			bgWorkerLabel: "Max concurrent workers",
+			bgBatchSizeLabel: "Files per worker (per run)",
+			bgSleepLabel: "Delay between file conversions",
+			bgIdleAwareLabel: "Pause when active users are above threshold",
+			bgActiveUsersLabel: "Active users threshold",
+			bgActivityWindowLabel: "Traffic window for activity check (seconds)",
+			bgQuietWindowLabel: "Enable quiet window",
+			bgQuietWindowStartLabel: "Quiet window start",
+			bgQuietWindowEndLabel: "Quiet window end",
+			secondsLabel: "seconds"
 		},
 		es: {
 			pluginName: "Avif expreso",

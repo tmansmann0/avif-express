@@ -413,4 +413,236 @@ class Options
 
         return update_option('avifbackgroundevents',$value);
     }
+
+    public static function ajaxGetBgWorkerCount()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::getBgWorkerCount());
+        wp_die();
+    }
+
+    public static function getBgWorkerCount()
+    {
+        return max(1, min(2, (int)get_option('avifbgworkercount', 1)));
+    }
+
+    public static function ajaxSetBgWorkerCount()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::setBgWorkerCount((int)sanitize_text_field($_POST['avifbgworkercount'])));
+        wp_die();
+    }
+
+    public static function setBgWorkerCount($value = 1)
+    {
+        $value = (int)$value;
+        $value = max(1, min(2, $value));
+        return update_option('avifbgworkercount', $value);
+    }
+
+    public static function ajaxGetBgRunBatchSize()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::getBgRunBatchSize());
+        wp_die();
+    }
+
+    public static function getBgRunBatchSize()
+    {
+        return max(10, min(25, (int)get_option('avifbgrunbatchsize', 20)));
+    }
+
+    public static function ajaxSetBgRunBatchSize()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::setBgRunBatchSize((int)sanitize_text_field($_POST['avifbgrunbatchsize'])));
+        wp_die();
+    }
+
+    public static function setBgRunBatchSize($value = 20)
+    {
+        $value = (int)$value;
+        $value = max(10, min(25, $value));
+        return update_option('avifbgrunbatchsize', $value);
+    }
+
+    public static function ajaxGetBgSleepSeconds()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::getBgSleepSeconds());
+        wp_die();
+    }
+
+    public static function getBgSleepSeconds()
+    {
+        return max(0, min(2, (int)get_option('avifbgsleepseconds', 1)));
+    }
+
+    public static function ajaxSetBgSleepSeconds()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::setBgSleepSeconds((int)sanitize_text_field($_POST['avifbgsleepseconds'])));
+        wp_die();
+    }
+
+    public static function setBgSleepSeconds($value = 1)
+    {
+        $value = (int)$value;
+        $value = max(0, min(2, $value));
+        return update_option('avifbgsleepseconds', $value);
+    }
+
+    public static function ajaxGetBgIdleAware()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::getBgIdleAware());
+        wp_die();
+    }
+
+    public static function getBgIdleAware()
+    {
+        return (bool)get_option('avifbgidleaware', false);
+    }
+
+    public static function ajaxSetBgIdleAware()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::setBgIdleAware($_POST['avifbgidleaware']));
+        wp_die();
+    }
+
+    public static function setBgIdleAware($value = false)
+    {
+        return update_option('avifbgidleaware', (string)$value === '1' || (string)$value === 'true');
+    }
+
+    public static function ajaxGetBgActiveUsers()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::getBgActiveUsers());
+        wp_die();
+    }
+
+    public static function getBgActiveUsers()
+    {
+        return max(1, (int)get_option('avifbgactiveusers', 3));
+    }
+
+    public static function ajaxSetBgActiveUsers()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::setBgActiveUsers((int)sanitize_text_field($_POST['avifbgactiveusers'])));
+        wp_die();
+    }
+
+    public static function setBgActiveUsers($value = 3)
+    {
+        return update_option('avifbgactiveusers', max(1, (int)$value));
+    }
+
+    public static function ajaxGetBgActivityWindowSeconds()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::getBgActivityWindowSeconds());
+        wp_die();
+    }
+
+    public static function getBgActivityWindowSeconds()
+    {
+        return max(15, (int)get_option('avifbgactivitywindowseconds', 60));
+    }
+
+    public static function ajaxSetBgActivityWindowSeconds()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::setBgActivityWindowSeconds((int)sanitize_text_field($_POST['avifbgactivitywindowseconds'])));
+        wp_die();
+    }
+
+    public static function setBgActivityWindowSeconds($value = 60)
+    {
+        return update_option('avifbgactivitywindowseconds', max(15, (int)$value));
+    }
+
+    public static function ajaxGetBgQuietWindowEnabled()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::getBgQuietWindowEnabled());
+        wp_die();
+    }
+
+    public static function getBgQuietWindowEnabled()
+    {
+        return (bool)get_option('avifbgquietwindowenabled', false);
+    }
+
+    public static function ajaxSetBgQuietWindowEnabled()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::setBgQuietWindowEnabled($_POST['avifbgquietwindowenabled']));
+        wp_die();
+    }
+
+    public static function setBgQuietWindowEnabled($value = false)
+    {
+        return update_option('avifbgquietwindowenabled', (string)$value === '1' || (string)$value === 'true');
+    }
+
+    public static function ajaxGetBgQuietWindowStart()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::getBgQuietWindowStart());
+        wp_die();
+    }
+
+    public static function getBgQuietWindowStart()
+    {
+        return sanitize_text_field(get_option('avifbgquietwindowstart', '01:00'));
+    }
+
+    public static function ajaxSetBgQuietWindowStart()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::setBgQuietWindowStart(sanitize_text_field($_POST['avifbgquietwindowstart'])));
+        wp_die();
+    }
+
+    public static function setBgQuietWindowStart($value = '01:00')
+    {
+        $value = sanitize_text_field($value);
+        if (!preg_match('/^(?:2[0-3]|[01]?\d):[0-5]\d$/', $value)) {
+            return false;
+        }
+
+        return update_option('avifbgquietwindowstart', $value);
+    }
+
+    public static function ajaxGetBgQuietWindowEnd()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::getBgQuietWindowEnd());
+        wp_die();
+    }
+
+    public static function getBgQuietWindowEnd()
+    {
+        return sanitize_text_field(get_option('avifbgquietwindowend', '06:00'));
+    }
+
+    public static function ajaxSetBgQuietWindowEnd()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo json_encode(self::setBgQuietWindowEnd(sanitize_text_field($_POST['avifbgquietwindowend'])));
+        wp_die();
+    }
+
+    public static function setBgQuietWindowEnd($value = '06:00')
+    {
+        $value = sanitize_text_field($value);
+        if (!preg_match('/^(?:2[0-3]|[01]?\d):[0-5]\d$/', $value)) {
+            return false;
+        }
+
+        return update_option('avifbgquietwindowend', $value);
+    }
 }
