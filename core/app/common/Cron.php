@@ -54,6 +54,8 @@ class Cron
     //the actual work getting done here - not related to schedule or action hook
     public function initiateConversion()
     {
+        self::syncBackgroundWorkerStates();
+
         // check if background image conversion is enabled or not 
         $directoryToTarget = Options::getBackgroundConv();
         if ($directoryToTarget == 'off') return false;
@@ -81,15 +83,7 @@ class Cron
 
         if (empty($filesToConvert)) return false;
 
-        if (Options::getBgNoProcessingWindowEnabled() && self::isInNoProcessingWindow()) {
-            return false;
-        }
-
-        if (Options::getBgQuietWindowEnabled() && !self::isInQuietWindow()) {
-            return false;
-        }
-
-        if (Options::getBgIdleAware() && self::isBusyWindow()) {
+        if (self::shouldPauseBackgroundProcessing()) {
             return false;
         }
 
@@ -142,6 +136,72 @@ class Cron
 
         $window = max(15, (int)Options::getBgActivityWindowSeconds());
         set_transient(self::AVIF_BG_ACTIVITY_TRANSIENT, $activity, $window * 2);
+
+        self::syncBackgroundWorkerStates();
+    }
+
+    public static function shouldPauseBackgroundProcessing()
+    {
+        if (Options::getBackgroundConv() === 'off') {
+            return true;
+        }
+
+        if (Options::getBgNoProcessingWindowEnabled() && self::isInNoProcessingWindow()) {
+            return true;
+        }
+
+        if (Options::getBgQuietWindowEnabled() && !self::isInQuietWindow()) {
+            return true;
+        }
+
+        if (Options::getBgIdleAware() && self::isBusyWindow()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function syncBackgroundWorkerStates()
+    {
+        for ($worker = 0; $worker < 2; $worker++) {
+            $backgroundImageConverterObj = BackgroundImageConverter::get_instance($worker);
+
+            if (self::shouldPauseBackgroundProcessing()) {
+                if ($backgroundImageConverterObj->is_processing() || $backgroundImageConverterObj->is_queued()) {
+                    $backgroundImageConverterObj->pause();
+                }
+                continue;
+            }
+
+            if ($backgroundImageConverterObj->is_paused() && $backgroundImageConverterObj->is_queued()) {
+                $backgroundImageConverterObj->resume();
+            }
+        }
+    }
+
+    public static function killBackgroundWorkers()
+    {
+        $workersKilled = 0;
+
+        for ($worker = 0; $worker < 2; $worker++) {
+            $backgroundImageConverterObj = BackgroundImageConverter::get_instance($worker);
+
+            if (
+                $backgroundImageConverterObj->is_processing() ||
+                $backgroundImageConverterObj->is_queued() ||
+                $backgroundImageConverterObj->is_paused() ||
+                $backgroundImageConverterObj->is_cancelled()
+            ) {
+                $workersKilled++;
+            }
+
+            $backgroundImageConverterObj->killWorker();
+        }
+
+        return [
+            'workersKilled' => $workersKilled,
+            'status' => self::getProcessingStatus(),
+        ];
     }
 
     private static function isBusyWindow()
@@ -208,6 +268,7 @@ class Cron
             'idleAwareEnabled' => Options::getBgIdleAware(),
             'isBusyWindow' => $isBusy,
             'cronScheduled' => $isCronScheduled,
+            'workerCountConfigured' => (int) Options::getBgWorkerCount(),
             'nextRunTimestamp' => $nextRunTimestamp ?: 0,
             'nextRunLocal' => $nextRunTimestamp ? wp_date('Y-m-d H:i:s', $nextRunTimestamp) : '',
             'currentTimeLocal' => wp_date('Y-m-d H:i:s', current_time('timestamp')),

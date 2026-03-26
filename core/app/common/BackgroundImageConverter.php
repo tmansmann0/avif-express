@@ -18,16 +18,20 @@ class BackgroundImageConverter extends WP_Background_Process{
 
     protected $driver;
 
+    private $workerId = 0;
+
     private static $instances = [];
 
     public function __construct($workerId = 0)
     {   
         parent::__construct();
-        $this->action = 'bgic_' . absint($workerId);
+        $this->workerId = absint($workerId);
+        $this->action = 'bgic_' . $this->workerId;
         $this->quality = Options::getImageQuality();
         $this->speed = Options::getComSpeed();
         $this->driver = IS_IMAGICK_AVIF ? 'imagick' : 'gd';
         add_filter($this->identifier . '_seconds_between_batches', array($this, 'getSecondsBetweenBatches'));
+        add_filter($this->identifier . '_pre_dispatch', array($this, 'maybePreventDispatch'), 10, 2);
 
         
     }
@@ -46,6 +50,11 @@ class BackgroundImageConverter extends WP_Background_Process{
 
     //actual works  
     protected function task($item){
+        if (Cron::shouldPauseBackgroundProcessing()) {
+            $this->pause();
+            return $item;
+        }
+
         if (!file_exists($item)) {
             return false;
         }
@@ -60,10 +69,27 @@ class BackgroundImageConverter extends WP_Background_Process{
         return false;
     }
 
+    public function maybePreventDispatch($cancel, $chainId)
+    {
+        if (Cron::shouldPauseBackgroundProcessing()) {
+            $this->pause();
+            return true;
+        }
+
+        return $cancel;
+    }
+
     public function getSecondsBetweenBatches($seconds)
     {
         $configured = Options::getBgSleepSeconds();
         return max(0, (int)$configured);
+    }
+
+    public function killWorker()
+    {
+        $this->pause();
+        $this->delete_all();
+        $this->cancel();
     }
 
     //optional

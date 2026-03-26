@@ -21,11 +21,17 @@
 					<div class="text-xs uppercase tracking-wide text-slate-300">{{ t('bgStatusTitle') }}</div>
 					<div class="text-lg font-semibold">{{ statusHeadline }}</div>
 				</div>
-				<button class="px-3 py-2 rounded bg-blue-600 hover:bg-blue-500 transition" type="button" @click="loadProcessingStatus">
-					{{ t('refreshStatusLabel') }}
-				</button>
+				<div class="flex gap-2">
+					<button class="px-3 py-2 rounded bg-blue-600 hover:bg-blue-500 transition" type="button" @click="loadProcessingStatus">
+						{{ t('refreshStatusLabel') }}
+					</button>
+					<button class="px-3 py-2 rounded bg-rose-600 hover:bg-rose-500 transition" type="button" @click="killBgWorkers">
+						{{ t('killWorkersLabel') }}
+					</button>
+				</div>
 			</div>
 			<div class="mt-2 text-sm text-slate-200">{{ statusReason }}</div>
+			<div class="mt-2 text-sm text-amber-200" v-if="lastKillMessage">{{ lastKillMessage }}</div>
 			<div class="mt-3 grid md:grid-cols-2 gap-3 text-sm">
 				<div class="rounded bg-slate-800/80 p-3">
 					<div class="text-slate-300">{{ t('bgCurrentTimeLabel') }}</div>
@@ -169,6 +175,7 @@ const bgNoProcessingWindowEnabled = ref(false);
 const bgNoProcessingWindowStart = ref('22:00');
 const bgNoProcessingWindowEnd = ref('08:00');
 const processingStatus = ref({});
+const lastKillMessage = ref('');
 
 let statusRefreshTimer = null;
 
@@ -414,6 +421,16 @@ const loadProcessingStatus = () => {
 	fetchJson('ajaxGetBgProcessingStatus')
 		.then((res) => {
 			processingStatus.value = res || {};
+		})
+		.catch((err) => console.log(err));
+};
+
+const killBgWorkers = () => {
+	fetchJson('ajaxKillBgWorkers')
+		.then((res) => {
+			const killed = Number(res?.workersKilled || 0);
+			lastKillMessage.value = t('killWorkersResultLabel', { count: killed });
+			processingStatus.value = res?.status || {};
 		})
 		.catch((err) => console.log(err));
 };

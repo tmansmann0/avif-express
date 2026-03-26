@@ -66,6 +66,8 @@ const i18n = createI18n({
 			bgNoProcessingWindowEndLabel: "No processing end",
 			bgStatusTitle: "Processing status",
 			refreshStatusLabel: "Refresh status",
+			killWorkersLabel: "Kill workers now",
+			killWorkersResultLabel: "Kill request sent to {count} worker(s). Any current image will stop after its current item finishes.",
 			bgStatusReady: "Background conversion is allowed",
 			bgStatusPaused: "Background conversion is paused",
 			bgReasonReady: "The service is allowed to run when the scheduler fires.",
