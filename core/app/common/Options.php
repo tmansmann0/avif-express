@@ -723,6 +723,13 @@ class Options
         wp_die();
     }
 
+    public static function ajaxKillBgWorkers()
+    {
+        if (!wp_verify_nonce($_POST['avife_nonce'], 'avife_nonce')) wp_die();
+        echo wp_json_encode(Cron::killBackgroundWorkers());
+        wp_die();
+    }
+
     private static function normalizeBoolValue($value)
     {
         return (string)$value === '1' || (string)$value === 'true';

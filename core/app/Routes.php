@@ -71,6 +71,7 @@ class Routes
         add_action('wp_ajax_ajaxGetBgNoProcessingWindowEnd', array('Avife\common\Options', 'ajaxGetBgNoProcessingWindowEnd'));
         add_action('wp_ajax_ajaxSetBgNoProcessingWindowEnd', array('Avife\common\Options', 'ajaxSetBgNoProcessingWindowEnd'));
         add_action('wp_ajax_ajaxGetBgProcessingStatus', array('Avife\common\Options', 'ajaxGetBgProcessingStatus'));
+        add_action('wp_ajax_ajaxKillBgWorkers', array('Avife\common\Options', 'ajaxKillBgWorkers'));
 
         add_action('wp_ajax_ajaxCountMedia', array('Avife\common\Media', 'ajaxCountMedia'));
         add_action('wp_ajax_ajaxConvertRemaining', array('Avife\common\Media', 'ajaxConvertRemaining'));
